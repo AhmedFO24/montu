@@ -34,13 +34,13 @@ def cmd_vel_callback(data):
     # Calculate right and left RPMs based on angular velocity
     if angular_velocity > 0:
         # Turning Left
-        rpm_left = forward_rpm - angular_rpm if forward_rpm - angular_rpm > -116 else -116 # Decrease RPM of the right motor
-        rpm_right = min(forward_rpm + angular_rpm, MAX_RPM)  # Left motor remains at full RPM
+        rpm_left = forward_rpm - angular_rpm if forward_rpm - angular_rpm > -116 else -116 # Right motor remains at full RPM
+        rpm_right = min(forward_rpm + angular_rpm, MAX_RPM)  # Decrease RPM of the left motor
         status_msg = "Turning Left"
     elif angular_velocity < 0:
         # Turning Right
-        rpm_left = min(forward_rpm + angular_rpm, MAX_RPM) # Right motor remains at full RPM
-        rpm_right = forward_rpm - angular_rpm if forward_rpm - angular_rpm > -116 else -116
+        rpm_left = min(forward_rpm + angular_rpm, MAX_RPM) # Left motor remains at full RPM
+        rpm_right = forward_rpm - angular_rpm if forward_rpm - angular_rpm > -116 else -116 # Right decreases it's rpm
         status_msg = "Turning Right"
     else:
         # Moving straight
