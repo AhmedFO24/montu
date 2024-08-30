@@ -1,0 +1,8 @@
+prefix=/home/montu/catkin_ws/install
+
+Name: montu
+Description: Description of montu
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
