@@ -1,0 +1,79 @@
+option explicit
+' Mecanum drive demonstrator
+' Script is written for use in SDC2130 but will work on any other model by changing where commented.
+' Script must be loaded and executed in controller that will serve as Master on a RoboCAN network.
+' Second dual channel controller will act a Slave. Master node id=1, Slave node id=2
+' Script is provided for demonstration purposes, as-is without warranty.
+' Previous values for change detection
+
+dim speed_right as integer ' Rear right motor
+dim speed_left as integer ' Rear left motor
+
+dim Power1 as integer  ' Right
+dim Power2 as integer  ' Left
+
+dim rpm_1 as integer  ' Right
+dim rpm_2 as integer
+
+dim current_1 as integer   'Right
+dim current_2 as integer
+
+speed_right=0
+speed_left=0
+
+setconfig(_BRUN, 1)
+'setconfig(_BLFB, 1, 1)
+SetCommand(_G, 1, 0)
+SetCommand(_G, 2, 0)
+Top:
+'Speed = abs(getvalue(_S, 1))
+'V1=0
+' Use code below to accept commands via RS232 or USB
+' Send commands with !VAR nn value
+' VAR 1 contains motion speed, +/-1000 range
+' VAR 2 contains motion direction, 0-360 degree range
+' VAR 3 contains rotation speed, +/-1000 range
+speed_right = getvalue(_VAR, 1)
+speed_left = getvalue(_VAR, 3)
+
+'print("Speed=",Speed,"\n")
+SetCommand(_G, 1, speed_right)
+SetCommand(_G, 2, speed_left)
+
+
+'BatteryVolts = getvalue(_VOLTS, 1)
+' Compute power from each channel by multiplying the retrieve battery amps by the battery voltage
+' Since Amps and Volts are measured x10 each (ie, 245 = 24.5), the result must be divided by 10
+' For best precision do all the multiplications first. Because the math is done with integers only
+' (i.e. no decimals), getvalue(_BATAMPS, 1) /100 * BatteryVolts would not give an accurate result 
+' even though the formula is mathematically equivalent.
+Power1 = (getvalue(_MOTAMPS, 1) * getvalue(_VOLTS, 2)*getvalue(_MOTPWR, 1)) / 100000
+Power2 = (getvalue(_MOTAMPS, 2) * getvalue(_VOLTS, 2)*getvalue(_MOTPWR, 2)) / 100000
+
+rpm_1 = getvalue(_BS, 1)
+rpm_2 = getvalue(_BS, 2)
+
+
+current_1 = getvalue(_MOTAMPS, 1)/10
+current_2 = getvalue(_MOTAMPS, 2)/10
+' Output the two power values. E.g. W=55:66. Terminate with "\r" for cariage return
+' print ("!",Power1,":",Power2,"^","\n")
+
+
+
+
+print (rpm_1,",",rpm_2,",",current_1,",",current_2,",",Power1,",",Power2,"\n")
+
+'end if
+
+'wait(2000)
+'V2=10*V1
+'print("V2=",V2,"\n")
+'SetCommand(_G, 1, V2)
+'wait(2000)
+'SetCommand(_G, 2, V2)
+' Send command to Slave, node 2 on RoboCAN network
+'SetCANCommand(2, _G, 1, V3)
+'SetCANCommand(2, _G, 2, V4)
+wait(10) ' Repeat loop every 10ms / 100Hz
+goto top
