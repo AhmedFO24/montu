@@ -1,8 +1,0 @@
-prefix=/home/montu/catkin_ws/install
-
-Name: munto
-Description: Description of munto
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
