@@ -37,7 +37,7 @@ def get_readings_from_driver():
         status = ser_driver.readline()
     return status.decode('ascii') if status else ""  # Decode if status has a value, else return an empty string
 
-# Write the desired speed on the driver
+# Write the desired speed on the driver using Serial
 def motor_write(speed):
     ser_driver.write(speed.encode('ascii'))
 

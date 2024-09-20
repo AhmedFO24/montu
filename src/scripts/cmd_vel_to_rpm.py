@@ -20,9 +20,9 @@ def cmd_vel_callback(data):
     Callback function to handle incoming velocity commands.
     Maps joystick values to motor RPMs for skid steering.
     """
-    linear_velocity = data.linear.x  # Extract the linear velocity from the Twist message
-    angular_velocity = data.angular.z  # Extract the angular velocity from the Twist message
-
+    linear_velocity = data.linear.x # Extract the linear velocity from the Twist message
+    angular_velocity = data.angular.z # Extract the angular velocity from the Twist message
+    
     # Map the joystick values to RPM
     forward_rpm = map_range(linear_velocity, 0.0, 1.0, 0.0, MAX_RPM)  # Forward RPM from 0 to MAX_RPM
     angular_rpm = map_range(abs(angular_velocity), 0.0, 1.0, 0.0, MAX_RPM)   # Angular RPM from 0 to MAX_RPM

@@ -12,8 +12,15 @@ def joy_callback(data):
     twist = Twist()  # Create a new Twist message instance
 
     # Map joystick axes to linear and angular velocities
-    twist.linear.x = data.axes[4]  # Map the forward/backward joystick axis (assumed index 1) to linear velocity
-    twist.angular.z = data.axes[3]  # Map the left/right joystick axis (assumed index 0) to angular velocity
+    if data.axes[7] != 0:  # Check if the forward/backward button is pressed
+        twist.linear.x = data.axes[7]  # Use axes[8] for primary movement
+    else:
+        twist.linear.x = data.axes[4]  # Otherwise use axes[4] for control
+    
+    if data.axes[6] != 0:  # Check if the right/left button is pressed
+        twist.angular.z = data.axes[6]  # Use axes[7] for primary movement
+    else:
+        twist.angular.z = data.axes[3]  # Otherwise use axes[3] for control
 
     cmd_vel_pub.publish(twist)  # Publish the Twist message to the /cmd_vel topic
 
