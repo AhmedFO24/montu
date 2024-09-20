@@ -1,0 +1,23 @@
+<launch>
+
+    <!-- Start roscore if it’s not already running -->
+    <arg name="core" default="false" />
+    <node if="$(arg core)" pkg="roscore" type="roscore" name="roscore" />
+
+    <!-- Start joy_node with specified device -->
+    <node pkg="joy" type="joy_node" name="joy_node">
+        <param name="dev" value="/dev/input/js1" />
+    </node>
+
+    <!-- Run your Python script joy_to_cmd.py -->
+    <node pkg="montu" type="joy_to_cmd.py" name="joy_to_cmd" output="screen">
+        <param name="use_sim_time" value="false"/>
+    </node>
+
+    <!-- Run cmd_vel_to_rpm.py -->
+    <node pkg="montu" type="cmd_vel_to_rpm.py" name="cmd_vel_to_rpm" output="screen" />
+
+    <!-- Run drive_UGV_dual_serial_read_power.py -->
+    <!-- <node pkg="montu" type="drive_UGV_dual_serial_read_power.py" name="drive_UGV_dual_serial_read_power" output="screen" /> -->
+
+</launch>
