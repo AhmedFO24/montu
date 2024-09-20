@@ -79,16 +79,28 @@ def callback(msg):
         # Turning Left
         rpm_left = forward_rpm - angular_rpm if forward_rpm - angular_rpm > -MAX_RPM else -MAX_RPM # Right motor remains at full RPM
         rpm_right = min(forward_rpm + angular_rpm, MAX_RPM)  # Decrease RPM of the left motor
+        rospy.loginfo("Turning Left")
         status_msg = "Turning Left"
     elif angular_velocity < 0:
         # Turning Right
         rpm_left = min(forward_rpm + angular_rpm, MAX_RPM) # Left motor remains at full RPM
         rpm_right = forward_rpm - angular_rpm if forward_rpm - angular_rpm > -MAX_RPM else -MAX_RPM # Right decreases it's rpm
+        rospy.loginfo("Turning Right")
         status_msg = "Turning Right"
     else:
         # Moving straight
         rpm_right = forward_rpm
         rpm_left = forward_rpm
+        rospy.loginfo("Moving Forward")
+        status_msg = "Moving Forward"
+    
+    if rpm_left < 0 and rpm_right < 0:
+        rospy.loginfo("Moving Backward")
+        status_msg = "Moving Backward"
+    
+    if rpm_left == 0 and rpm_right == 0:
+        rospy.loginfo("Stopped")
+        status_msg = "Stopped"
     
     # Converting Readings from 0 to 1000
     driver_speed[0] = round(((rpm_right + MAX_RPM) * 1000/MAX_RPM) - 1000)
@@ -113,6 +125,7 @@ def callback(msg):
         motor_write('!VAR 1 0\r')
         motor_write('!VAR 3 0\r')
     
+    status_pub.publish(status_msg)
     #################################### Reading data ###################
     power_data = get_readings_from_driver()
     temp_power_data = power_data.split('\n')   #Split it into an array called dataArray
@@ -153,5 +166,7 @@ if __name__ == '__main__':
     
     rospy.init_node('drive_montu')
     rospy.Subscriber("/cmd_vel", Twist, callback)
+    global status_pub
+    status_pub = rospy.Publisher('/status', String, queue_size=10)  # Create a publisher for /status
     rospy.spin()
 

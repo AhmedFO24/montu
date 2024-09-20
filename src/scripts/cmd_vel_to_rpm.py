@@ -36,22 +36,29 @@ def cmd_vel_callback(data):
         # Turning Left
         rpm_left = forward_rpm - angular_rpm if forward_rpm - angular_rpm > -116 else -116 # Right motor remains at full RPM
         rpm_right = min(forward_rpm + angular_rpm, MAX_RPM)  # Decrease RPM of the left motor
+        rospy.loginfo("Turning Left")
         status_msg = "Turning Left"
+        
     elif angular_velocity < 0:
         # Turning Right
         rpm_left = min(forward_rpm + angular_rpm, MAX_RPM) # Left motor remains at full RPM
         rpm_right = forward_rpm - angular_rpm if forward_rpm - angular_rpm > -116 else -116 # Right decreases it's rpm
+        rospy.loginfo("Turning Right")
         status_msg = "Turning Right"
+        
     else:
         # Moving straight
         rpm_right = forward_rpm
         rpm_left = forward_rpm
+        rospy.loginfo("Moving Forward")
         status_msg = "Moving Forward"
     
     if rpm_left < 0 and rpm_right < 0:
+        rospy.loginfo("Moving Backward")
         status_msg = "Moving Backward"
     
     if rpm_left == 0 and rpm_right == 0:
+        rospy.loginfo("Stopped")
         status_msg = "Stopped"
 
     # Publish the mapped RPM values to the respective topics

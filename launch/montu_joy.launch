@@ -15,9 +15,12 @@
     </node>
 
     <!-- Run cmd_vel_to_rpm.py -->
-    <node pkg="montu" type="cmd_vel_to_rpm.py" name="cmd_vel_to_rpm" output="screen" />
+    <!-- <node pkg="montu" type="cmd_vel_to_rpm.py" name="cmd_vel_to_rpm" output="screen" /> -->
 
     <!-- Run drive_UGV_dual_serial_read_power.py -->
-    <!-- <node pkg="montu" type="drive_UGV_dual_serial_read_power.py" name="drive_UGV_dual_serial_read_power" output="screen" /> -->
+    <node pkg="montu" type="drive_UGV_dual_serial_read_power.py" name="drive_UGV_dual_serial_read_power" output="screen" />
+
+    <!-- Run drive_UGV_dual_serial_read_power.py -->
+    <!-- <node pkg="montu" type="drive_UGV_dual_serial_read_power_2.py" name="drive_UGV_dual_serial_read_power_FOUAD" output="screen" /> -->
 
 </launch>
