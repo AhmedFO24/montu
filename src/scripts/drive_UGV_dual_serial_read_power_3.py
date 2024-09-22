@@ -4,8 +4,9 @@
 # Calculating the required velocity for each driving motor based on command velocity and kinematics of Tamer UGV
 # Please give credit if used
 
-# Use the top button to move with 3 speeds
+# Use the top button to move with 3 speeds.
 # adjust Serial connection /dev/ttyACM0 and /dev/ttyACM1 
+# Write data to file and publish it
 
 import rospy
 import rospkg
@@ -33,6 +34,19 @@ def millis():
     ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
     return ms
 
+# Connect to serial driver
+def connect_serial():
+    ports = ['/dev/ttyACM0', '/dev/ttyACM1']
+    for port in ports:
+        try:
+            ser_driver = serial.Serial(port, 115200)
+            rospy.loginfo(f"Connected to {port}")
+            return ser_driver
+        except serial.SerialException:
+            rospy.loginfo(f"Failed to connect to {port}")
+            rospy.sleep(1)
+    raise Exception("Could not connect to any available port")
+
 # Read what the driver prints 
 def get_readings_from_driver():
     status = b''  # Initialize as an empty byte string
@@ -45,6 +59,47 @@ def motor_write(speed):
     global ser_driver
     ser_driver.write(speed.encode('ascii'))
     ser_driver.flush()  # Ensure the command is sent immediately
+
+def write_data_to_file_and_publish():
+    power_data = get_readings_from_driver()
+    
+    if power_data:
+        temp_power_data = power_data.split('\n')   #Split it into an array called dataArray
+        power = temp_power_data[0]
+        # ms = millis()
+        packet= f"{power}\n"
+        rospy.loginfo(packet)
+        
+        # Extract RPM values
+        rpm_values = power.split(',')  # Split the string by commas
+        if len(rpm_values) >= 2:  # Ensure there are at least two values
+            try:
+                rpm_right = int(rpm_values[0])  # Convert to int
+                rpm_left = int(rpm_values[1])   # Convert to int
+                
+                # Publish RPM values
+                rpm_right_pub.publish(rpm_right)
+                rpm_left_pub.publish(rpm_left)
+            
+            except ValueError:
+                rospy.logerr("Error converting RPM values to integers")
+        
+        try:
+            # Open the file in append mode
+            file_path = "/home/montu/record data/exported_data.txt"
+            with open(file_path, "a") as file:
+                # Check if the file is empty
+                if os.stat(file_path).st_size == 0:
+                    # Write the header line if the file is empty
+                    file.write("rpm_right,rpm_left,current_right,current_left,power_right,power_left\n")
+                file.write(packet)
+        except Exception as e:
+            rospy.logerr(f"Error writing to file: {e}")
+            return None  # Return None in case of an error
+        return packet
+    else:
+        rospy.logwarn("No power data received")
+        return None  # Return None if no data was received
 
 # I think this not used here
 def readData():
@@ -132,28 +187,8 @@ def callback(msg):
         motor_write('!VAR 3 0\r')
     
     status_pub.publish(status_msg)
-    #################################### Reading data ###################
-    power_data = get_readings_from_driver()
-    temp_power_data = power_data.split('\n')   #Split it into an array called dataArray
-    power = temp_power_data[0]
-    
-    ms = millis()
-    packet= f"{str(ms)},{power}\n"
-    print(packet)
-    file.write(packet)
+    write_data_to_file_and_publish()
 
-# adjust Serial connection /dev/ttyACM0 and /dev/ttyACM1 
-def connect_serial():
-    ports = ['/dev/ttyACM0', '/dev/ttyACM1']
-    for port in ports:
-        try:
-            ser_driver = serial.Serial(port, 115200)
-            rospy.loginfo(f"Connected to {port}")
-            return ser_driver
-        except serial.SerialException:
-            rospy.loginfo(f"Failed to connect to {port}")
-            rospy.sleep(1)
-    raise Exception("Could not connect to any available port")
 
 if __name__ == '__main__':
     rospy.init_node('drive_montu')  # Initialize ROS node at the very beginning
@@ -183,18 +218,14 @@ if __name__ == '__main__':
         # sleep for 1 seconds
         rospy.sleep(1)
         
-        # Open the file in append mode
-        file_path = "/home/montu/record data/exported_data.txt"
-        with open(file_path, "a") as file:
-            # Check if the file is empty
-            if os.stat(file_path).st_size == 0:
-                # Write the header line if the file is empty
-                file.write("Time,rpm_right,rpm_left,current_right,current_left,power_right,power_left\n")
-        
         start_time = datetime.now()
         rospy.loginfo('Start')
         
         rospy.Subscriber("/cmd_vel", Twist, callback) # Subscribe to /cmd_vel
         status_pub = rospy.Publisher('/status', String, queue_size=10)  # Create a publisher for /status
+        rpm_right_pub = rospy.Publisher('/rpm_right', Int32, queue_size=10)
+        rpm_left_pub = rospy.Publisher('/rpm_left', Int32, queue_size=10)
+        
+        
         rospy.spin() # Keep the node running
 

@@ -1,12 +1,23 @@
+<!-- this is launch file for montu vehcile owned by Ahmed Fouad
+to run it
+roslaunch montu montu_joy.launch 
+in my pc joystick read on /dev/input/js1 but on montu pc the joystick is read on /dev/input/js0
+so when running it on montu I dont change the argument of "dev" to 1
+
+there is another argument which is the versions of the code since I'm improving the code from time to time
+roslaunch montu montu_joy.launch  dev:=1 version:=2
+-->
+
 <launch>
 
     <!-- Start roscore if it’s not already running -->
     <arg name="core" default="false" />
     <node if="$(arg core)" pkg="roscore" type="roscore" name="roscore" />
-
+    
     <!-- Start joy_node with specified device -->
+    <arg name="dev" default="0" />  <!-- Default value -->
     <node pkg="joy" type="joy_node" name="joy_node">
-        <param name="dev" value="/dev/input/js1" />
+        <param name="dev" value="/dev/input/js$(arg dev)" />
     </node>
 
     <!-- Run your Python script joy_to_cmd.py -->
@@ -18,9 +29,10 @@
     <!-- <node pkg="montu" type="cmd_vel_to_rpm.py" name="cmd_vel_to_rpm" output="screen" /> -->
 
     <!-- Run drive_UGV_dual_serial_read_power.py -->
-    <node pkg="montu" type="drive_UGV_dual_serial_read_power.py" name="drive_UGV_dual_serial_read_power" output="screen" />
+    <!-- <node pkg="montu" type="drive_UGV_dual_serial_read_power.py" name="drive_UGV_dual_serial_read_power" output="screen" /> -->
 
-    <!-- Run drive_UGV_dual_serial_read_power.py -->
-    <!-- <node pkg="montu" type="drive_UGV_dual_serial_read_power_2.py" name="drive_UGV_dual_serial_read_power_FOUAD" output="screen" /> -->
+    <!-- Launch the specified version of drive_UGV -->
+    <arg name="version" default="2" />  <!-- Default version -->
+    <node pkg="montu" type="drive_UGV_dual_serial_read_power_$(arg version).py" name="drive_UGV_dual_serial_read_power" output="screen" />
 
 </launch>
