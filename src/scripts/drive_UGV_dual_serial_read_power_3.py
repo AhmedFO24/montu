@@ -83,12 +83,12 @@ def write_data_to_file_and_publish(event=None):
         if len(rpm_values) >= 2:  # Ensure there are at least two values
             cleaned_rpm_values = clean_rpm_data(rpm_values)
             try:
-                rpm_right = int(cleaned_rpm_values[0].strip())  # Convert to int
-                rpm_left = int(cleaned_rpm_values[1].strip())   # Convert to int
+                rpm_right_read = int(cleaned_rpm_values[0].strip())  # Convert to int
+                rpm_left_read = int(cleaned_rpm_values[1].strip())   # Convert to int
                 
                 # Publish RPM values
-                rpm_right_pub.publish(rpm_right)
-                rpm_left_pub.publish(rpm_left)
+                rpm_right_read_pub.publish(rpm_right_read)
+                rpm_left_read_pub.publish(rpm_left_read)
             
             except ValueError:
                 rospy.logerr("Error converting RPM values to integers")
@@ -207,7 +207,6 @@ def callback(msg):
     # Call write_data_to_file_and_publish continuously while joystick is pressed
     if msg.linear.x or msg.angular.z:
         write_data_to_file_and_publish()  # No argument needed
-    
 
 
 if __name__ == '__main__':
@@ -243,8 +242,8 @@ if __name__ == '__main__':
         
         rospy.Subscriber("/cmd_vel", Twist, callback) # Subscribe to /cmd_vel
         status_pub = rospy.Publisher('/status', String, queue_size=10)  # Create a publisher for /status
-        rpm_right_pub = rospy.Publisher('/rpm_right', Int32, queue_size=10)
-        rpm_left_pub = rospy.Publisher('/rpm_left', Int32, queue_size=10)
+        rpm_right_read_pub = rospy.Publisher('/rpm_right_read', Int32, queue_size=10)
+        rpm_left_read_pub = rospy.Publisher('/rpm_left_read', Int32, queue_size=10)
         
         # Timer to call the function at regular intervals
         # rospy.Timer(rospy.Duration(0.1), write_data_to_file_and_publish)
