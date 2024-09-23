@@ -67,7 +67,7 @@ def clean_rpm_data(rpm_values):
         cleaned_values.append(clean_value)
     return cleaned_values
 
-def write_data_to_file_and_publish():
+def write_data_to_file_and_publish(event):
     global file
     power_data = get_readings_from_driver()
     
