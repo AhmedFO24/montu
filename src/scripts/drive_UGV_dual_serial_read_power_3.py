@@ -67,7 +67,7 @@ def clean_rpm_data(rpm_values):
         cleaned_values.append(clean_value)
     return cleaned_values
 
-def write_data_to_file_and_publish(event):
+def write_data_to_file_and_publish(event=None):
     global file
     power_data = get_readings_from_driver()
     
@@ -204,7 +204,10 @@ def callback(msg):
         motor_write('!VAR 3 0\r')
     
     status_pub.publish(status_msg)
-    write_data_to_file_and_publish()
+    # Call write_data_to_file_and_publish continuously while joystick is pressed
+    if any(msg.axes) or any(msg.buttons):
+        write_data_to_file_and_publish()  # No argument needed
+    
 
 
 if __name__ == '__main__':
