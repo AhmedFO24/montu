@@ -27,6 +27,8 @@ from datetime import datetime
 
 MAX_RPM = 116  # maximum wheel speed (rpm)
 driver_speed = [0]*2 # [0, 0]
+rpm_right_read = 0
+rpm_left_read = 0
 
 # returns the elapsed milliseconds since the start of the program
 def millis():
