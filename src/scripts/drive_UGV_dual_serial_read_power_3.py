@@ -68,7 +68,7 @@ def clean_rpm_data(rpm_values):
     return cleaned_values
 
 def write_data_to_file_and_publish(event=None):
-    global file
+    global file, rpm_left_read, rpm_right_read
     power_data = get_readings_from_driver()
     
     if power_data:
@@ -171,6 +171,11 @@ def callback(msg):
         rpm_left = forward_rpm
         rospy.loginfo("Moving Forward")
         status_msg = "Moving Forward"
+        
+        difference = rpm_right_read > rpm_left_read
+        if difference:
+            rpm_left = (MAX_RPM*rpm_left_read) / rpm_right_read
+            
     
     if rpm_left < 0 and rpm_right < 0:
         rospy.loginfo("Moving Backward")
