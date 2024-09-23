@@ -185,6 +185,12 @@ if __name__ == '__main__':
         
         # Open the file in append mode
         file_path = "/home/montu/record data/exported_data.txt"
+        
+        # Ensure the directory exists, create it if it doesn't
+        directory = os.path.dirname(file_path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        
         with open(file_path, "a") as file:
             # Check if the file is empty
             if os.stat(file_path).st_size == 0:
