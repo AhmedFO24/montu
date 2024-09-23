@@ -60,6 +60,13 @@ def motor_write(speed):
     ser_driver.write(speed.encode('ascii'))
     ser_driver.flush()  # Ensure the command is sent immediately
 
+def clean_rpm_data(rpm_values):
+    cleaned_values = []
+    for value in rpm_values:
+        clean_value = value.replace('+', '').replace('\r', '').strip()
+        cleaned_values.append(clean_value)
+    return cleaned_values
+
 def write_data_to_file_and_publish():
     global file
     power_data = get_readings_from_driver()
@@ -74,9 +81,10 @@ def write_data_to_file_and_publish():
         # Extract RPM values
         rpm_values = power.split(',')  # Split the string by commas
         if len(rpm_values) >= 2:  # Ensure there are at least two values
+            cleaned_rpm_values = clean_rpm_data(rpm_values)
             try:
-                rpm_right = int(rpm_values[0].strip())  # Convert to int
-                rpm_left = int(rpm_values[1].strip())   # Convert to int
+                rpm_right = int(cleaned_rpm_values[0].strip())  # Convert to int
+                rpm_left = int(cleaned_rpm_values[1].strip())   # Convert to int
                 
                 # Publish RPM values
                 rpm_right_pub.publish(rpm_right)
@@ -84,7 +92,7 @@ def write_data_to_file_and_publish():
             
             except ValueError:
                 rospy.logerr("Error converting RPM values to integers")
-                rospy.logerr(f"Received rpm_values: {rpm_values}")
+                rospy.logerr(f"Received rpm_values: {cleaned_rpm_values}")
                 return None
         
         try:
