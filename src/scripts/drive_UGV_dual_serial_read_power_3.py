@@ -205,7 +205,7 @@ def callback(msg):
     
     status_pub.publish(status_msg)
     # Call write_data_to_file_and_publish continuously while joystick is pressed
-    if any(msg.linear.x) or any(msg.angular.z):
+    if msg.linear.x or msg.angular.z:
         write_data_to_file_and_publish()  # No argument needed
     
 
