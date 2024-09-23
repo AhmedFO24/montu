@@ -247,7 +247,7 @@ if __name__ == '__main__':
         rpm_left_pub = rospy.Publisher('/rpm_left', Int32, queue_size=10)
         
         # Timer to call the function at regular intervals
-        rospy.Timer(rospy.Duration(0.1), write_data_to_file_and_publish)
+        # rospy.Timer(rospy.Duration(0.1), write_data_to_file_and_publish)
         
         rospy.spin() # Keep the node running
         file.close()
