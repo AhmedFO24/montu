@@ -206,7 +206,8 @@ def callback(msg):
     status_pub.publish(status_msg)
     # Call write_data_to_file_and_publish continuously while joystick is pressed
     if msg.linear.x or msg.angular.z:
-        write_data_to_file_and_publish()  # No argument needed
+        rospy.Timer(rospy.Duration(0.1), write_data_to_file_and_publish)
+        # write_data_to_file_and_publish()  # No argument needed
 
 
 if __name__ == '__main__':
