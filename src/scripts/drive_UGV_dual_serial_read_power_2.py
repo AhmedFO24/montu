@@ -67,7 +67,7 @@ def map_range(value, from_min, from_max, to_min, to_max):
     return to_min + (scaled_value * to_range)
 
 def callback(msg):
-    global status_pub
+    global status_pub, file
     
     linear_velocity = msg.linear.x  # Extract the linear velocity from the Twist message (Forward and backward of the joystick)
     angular_velocity = msg.angular.z  # Extract the angular velocity from the Twist message (Right and Left of the joystick)
@@ -203,4 +203,5 @@ if __name__ == '__main__':
         rospy.Subscriber("/cmd_vel", Twist, callback) # Subscribe to /cmd_vel
         status_pub = rospy.Publisher('/status', String, queue_size=10)  # Create a publisher for /status
         rospy.spin() # Keep the node running
+        file.close()
 

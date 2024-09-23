@@ -61,6 +61,7 @@ def motor_write(speed):
     ser_driver.flush()  # Ensure the command is sent immediately
 
 def write_data_to_file_and_publish():
+    global file
     power_data = get_readings_from_driver()
     
     if power_data:
@@ -234,4 +235,5 @@ if __name__ == '__main__':
         
         
         rospy.spin() # Keep the node running
+        file.close()
 
