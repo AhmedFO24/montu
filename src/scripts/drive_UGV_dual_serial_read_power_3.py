@@ -75,8 +75,8 @@ def write_data_to_file_and_publish():
         rpm_values = power.split(',')  # Split the string by commas
         if len(rpm_values) >= 2:  # Ensure there are at least two values
             try:
-                rpm_right = int(rpm_values[0])  # Convert to int
-                rpm_left = int(rpm_values[1])   # Convert to int
+                rpm_right = int(rpm_values[0].strip())  # Convert to int
+                rpm_left = int(rpm_values[1].strip())   # Convert to int
                 
                 # Publish RPM values
                 rpm_right_pub.publish(rpm_right)
@@ -84,6 +84,8 @@ def write_data_to_file_and_publish():
             
             except ValueError:
                 rospy.logerr("Error converting RPM values to integers")
+                rospy.logerr(f"Received rpm_values: {rpm_values}")
+                return None
         
         try:
             # Open the file in append mode
