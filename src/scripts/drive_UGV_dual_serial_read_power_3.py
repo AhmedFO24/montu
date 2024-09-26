@@ -25,9 +25,7 @@ import socket
 import os 
 from datetime import datetime
 
-MAX_RPM_RIGHT = 2  # maximum wheel speed (rpm)
-MAX_RPM_LEFT = 116
-
+MAX_RPM = 116  # maximum wheel speed (rpm)
 driver_speed = [0]*2 # [0, 0]
 # rpm_right_read = 0
 # rpm_left_read = 0
@@ -148,11 +146,8 @@ def callback(msg):
     angular_velocity = msg.angular.z  # Extract the angular velocity from the Twist message (Right and Left of the joystick)
 
     # Map the joystick values to RPM (from (0:1) to (0:max_rpm))
-    forward_rpm_right = map_range(linear_velocity, 0.0, 1.0, 0.0, MAX_RPM_RIGHT)  # Forward RPM from 0 to MAX_RPM______(Forward and backward of the joystick)
-    forward_rpm_left = map_range(linear_velocity, 0.0, 1.0, 0.0, MAX_RPM_LEFT)
-
-    angular_rpm_right = map_range(abs(angular_velocity), 0.0, 1.0, 0.0, MAX_RPM_RIGHT)   # Angular RPM from 0 to MAX_RPM______(Right and Left of the joystick)
-    angular_rpm_left = map_range(abs(angular_velocity), 0.0, 1.0, 0.0, MAX_RPM_LEFT)
+    forward_rpm = map_range(linear_velocity, 0.0, 1.0, 0.0, MAX_RPM)  # Forward RPM from 0 to MAX_RPM______(Forward and backward of the joystick)
+    angular_rpm = map_range(abs(angular_velocity), 0.0, 1.0, 0.0, MAX_RPM)   # Angular RPM from 0 to MAX_RPM______(Right and Left of the joystick)
     
     # For skid steering:
     # - When moving forward, both motors should be at the same RPM.
@@ -161,20 +156,20 @@ def callback(msg):
     # Calculate right and left RPMs based on angular velocity
     if angular_velocity > 0:
         # Turning Left
-        rpm_left = forward_rpm_left - angular_rpm_left if forward_rpm_left - angular_rpm_left > -MAX_RPM_LEFT else -MAX_RPM_LEFT # Right motor remains at full RPM
-        rpm_right = min(forward_rpm_right + angular_rpm_right, MAX_RPM_RIGHT)  # Decrease RPM of the left motor
+        rpm_left = forward_rpm - angular_rpm if forward_rpm - angular_rpm > -MAX_RPM else -MAX_RPM # Right motor remains at full RPM
+        rpm_right = min(forward_rpm + angular_rpm, MAX_RPM)  # Decrease RPM of the left motor
         rospy.loginfo("Turning Left")
         status_msg = "Turning Left"
     elif angular_velocity < 0:
         # Turning Right
-        rpm_left = min(forward_rpm_left + angular_rpm_left, MAX_RPM_LEFT) # Left motor remains at full RPM
-        rpm_right = forward_rpm_right - angular_rpm_right if forward_rpm_right - angular_rpm_right > -MAX_RPM_RIGHT else -MAX_RPM_RIGHT # Right decreases it's rpm
+        rpm_left = min(forward_rpm + angular_rpm, MAX_RPM) # Left motor remains at full RPM
+        rpm_right = forward_rpm - angular_rpm if forward_rpm - angular_rpm > -MAX_RPM else -MAX_RPM # Right decreases it's rpm
         rospy.loginfo("Turning Right")
         status_msg = "Turning Right"
     else:
         # Moving straight
-        rpm_right = forward_rpm_right
-        rpm_left = forward_rpm_left
+        rpm_right = forward_rpm
+        rpm_left = forward_rpm
         rospy.loginfo("Moving Forward")
         status_msg = "Moving Forward"
         
@@ -192,8 +187,8 @@ def callback(msg):
         status_msg = "Stopped"
     
     # Converting Readings from 0 to 1000
-    driver_speed[0] = round(((rpm_right + MAX_RPM_RIGHT) * 1000/MAX_RPM_RIGHT) - 1000)
-    driver_speed[1] = round(((rpm_left + MAX_RPM_LEFT) * 1000/MAX_RPM_LEFT) - 1000)
+    driver_speed[0] = round(((rpm_right + MAX_RPM) * 800/MAX_RPM) - 800)
+    driver_speed[1] = round(((rpm_left + MAX_RPM) * 1000/MAX_RPM) - 1000)
     
     # This for preventing Skid Steering
     # if driver_speed[0] < 0 and driver_speed[1] > 0:
