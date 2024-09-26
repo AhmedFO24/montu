@@ -25,7 +25,7 @@ import socket
 import os 
 from datetime import datetime
 
-MAX_RPM_RIGHT = 0  # maximum wheel speed (rpm)
+MAX_RPM_RIGHT = 2  # maximum wheel speed (rpm)
 MAX_RPM_LEFT = 116
 
 driver_speed = [0]*2 # [0, 0]
