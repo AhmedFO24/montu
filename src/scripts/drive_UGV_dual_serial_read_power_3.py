@@ -187,7 +187,7 @@ def callback(msg):
         status_msg = "Stopped"
     
     # Converting Readings from 0 to 1000
-    driver_speed[0] = round(((rpm_right + MAX_RPM) * 800/MAX_RPM) - 800)
+    driver_speed[0] = round(((rpm_right + MAX_RPM) * 500/MAX_RPM) - 500)
     driver_speed[1] = round(((rpm_left + MAX_RPM) * 1000/MAX_RPM) - 1000)
     
     # This for preventing Skid Steering
