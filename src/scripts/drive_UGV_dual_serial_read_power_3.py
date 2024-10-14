@@ -111,10 +111,7 @@ def write_data_to_file_and_publish(event=None):
                     # Write the header line if the file is empty
                     file.write("rpm_right,rpm_left,current_right,current_left,power_right,power_left\n")
                 file.write(packet)
-        except Exception as e:
-            rospy.logerr(f"Error writing to file: {e}")
-            return None  # Return None in case of an error
-        return packet
+        except Exception as e:src/scripts/drive_UGV_dual_serial_read_power_3.py
     else:
         rospy.logwarn("No power data received")
         return None  # Return None if no data was received
@@ -187,8 +184,8 @@ def callback(msg):
         status_msg = "Stopped"
     
     # Converting Readings from 0 to 1000
-    driver_speed[0] = round(((rpm_right + MAX_RPM) * 980/MAX_RPM) - 450)
-    driver_speed[1] = round(((rpm_left + MAX_RPM) * 1000/MAX_RPM) - 500)
+    driver_speed[0] = round(((rpm_right + MAX_RPM) * 900/MAX_RPM) - 900)
+    driver_speed[1] = round(((rpm_left + MAX_RPM) * 1000/MAX_RPM) - 1000)
     
     # This for preventing Skid Steering
     # if driver_speed[0] < 0 and driver_speed[1] > 0:
