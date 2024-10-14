@@ -26,7 +26,7 @@ setconfig(_BRUN, 1)	' Configures the controller to automatically run channel 1
 SetCommand(_G, 1, 0)	' Set the speed of channels 1 to Zero
 SetCommand(_G, 2, 0)	' Set the speed of channels 2 to Zero
 
-' Top is uesd to create a loop
+' Top is used to create a loop
 Top:
 ' Use code below to accept commands via RS232 or USB
 ' Send commands with !VAR nn value
@@ -63,6 +63,7 @@ rpm_2 = getvalue(_BS, 2)
 
 current_1 = getvalue(_MOTAMPS, 1)/10
 current_2 = getvalue(_MOTAMPS, 2)/10
+
 ' Output the two power values. E.g. W=55:66. Terminate with "\r" for cariage return
 ' print ("!",Power1,":",Power2,"^","\n")
 
