@@ -26,11 +26,12 @@ import os
 from datetime import datetime
 import threading
 
+
 TUNNING = 18
 MAX_RPM_RIGHT = 965  # maximum wheel speed (rpm)
 MAX_RPM_LEFT = 1000
 driver_speed = [0]*2 # [0, 0]
-
+publish_time = 0.1 #sec
 
 # First thing is to connect to serial
 # Connect to serial driver (no change in it)
@@ -158,33 +159,27 @@ def callback(msg):
     linear_velocity = msg.linear.x  # Extract the linear velocity from the Twist message (Forward and backward of the joystick)
     angular_velocity = msg.angular.z  # Extract the angular velocity from the Twist message (Right and Left of the joystick)
 
+    forward_right = map_range(linear_velocity, 0.0, 1.0, 0.0, MAX_RPM_RIGHT)  # Forward RPM from 0 to MAX_RPM______(Forward and backward of the joystick)
+    forward_left = map_range(linear_velocity, 0.0, 1.0, 0.0, MAX_RPM_LEFT)  # Forward RPM from 0 to MAX_RPM______(Forward and backward of the joystick)
+    angular_right = map_range(abs(angular_velocity), 0.0, 1.0, 0.0, MAX_RPM_RIGHT)   # Angular RPM from 0 to MAX_RPM______(Right and Left of the joystick)
+    angular_left = map_range(abs(angular_velocity), 0.0, 1.0, 0.0, MAX_RPM_LEFT)   # Angular RPM from 0 to MAX_RPM______(Right and Left of the joystick)
+    
     # For skid steering:
     # - When moving forward, both motors should be at the same RPM.
     # - When turning, the right motor decreases RPM, and the left motor stays at MAX_RPM.
 
-    # Calculate right and left RPMs based on angular velocity
-    if angular_velocity == 1 and linear_velocity == 0:
+    if angular_velocity > 0 :
         # Turning Left
-        rpm_left = -MAX_RPM_LEFT # Right motor remains at full RPM
-        rpm_right = MAX_RPM_RIGHT  # Decrease RPM of the left motor
-    elif angular_velocity == -1 and linear_velocity == 0:
+        rpm_left = forward_left - angular_left if forward_left - angular_left > -MAX_RPM_LEFT else -MAX_RPM_LEFT # Right motor remains at full RPM
+        rpm_right = min(forward_right + angular_right, MAX_RPM_RIGHT)  # Decrease RPM of the left motor
+    elif angular_velocity < 0:
         # Turning Right
-        rpm_left = MAX_RPM_LEFT # Left motor remains at full RPM
-        rpm_right = -MAX_RPM_RIGHT # Right decreases it's rpm
-    elif linear_velocity == 1 and angular_velocity == 0:
-        # Moving straight
-        rpm_right = MAX_RPM_RIGHT
-        rpm_left = MAX_RPM_LEFT
-    elif linear_velocity == -1 and angular_velocity == 0:
-        # Moving Backward
-        rpm_right = -(MAX_RPM_RIGHT-5) # For tunnig
-        rpm_left = -MAX_RPM_LEFT
-    elif linear_velocity == 0 and angular_velocity == 0:
-        rpm_right = 0
-        rpm_left = 0
+        rpm_left = min(forward_left + angular_left, MAX_RPM_LEFT) # Left motor remains at full RPM
+        rpm_right = forward_right - angular_right if forward_right - angular_right > -MAX_RPM_RIGHT else -MAX_RPM_RIGHT # Right decreases it's rpm
     else:
-        rpm_right = linear_velocity* MAX_RPM_RIGHT
-        rpm_left = linear_velocity * MAX_RPM_LEFT
+        # Moving straight
+        rpm_right = forward_right
+        rpm_left = forward_left
         
     
     
@@ -198,7 +193,9 @@ def callback(msg):
     if msg.linear.x or msg.angular.z:
         write_data_to_file_and_publish()  # No argument needed
     
-
+# def subscribe_command(event):
+#     rospy.Subscriber("/cmd_vel", Twist, callback)
+    
 
 if __name__ == '__main__':
     rospy.init_node('drive_montu')  # Initialize ROS node at the very beginning
@@ -233,9 +230,11 @@ if __name__ == '__main__':
         
         start_time = datetime.now()
         rospy.loginfo('Start')
+        
         while not rospy.is_shutdown():
             rospy.Subscriber("/cmd_vel", Twist, callback) # Subscribe to /cmd_vel
             rospy.sleep(1)
+        # rospy.Timer(rospy.Duration(publish_time), subscribe_command) # Subscribe to /cmd_vel)
         
         rospy.spin() # Keep the node running
         file.close()

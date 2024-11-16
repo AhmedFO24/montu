@@ -77,7 +77,7 @@ def publish_command(event):
     Ensures that the commands are regularly sent.
     """
     cmd_vel_pub.publish(twist)
-    rospy.loginfo(f"Publishing Twist: linear.x={twist.linear.x}, angular.z={twist.angular.z}")
+    # rospy.loginfo(f"Publishing Twist: linear.x={twist.linear.x}, angular.z={twist.angular.z}")
 
 
 def joy_to_cmd_vel():
