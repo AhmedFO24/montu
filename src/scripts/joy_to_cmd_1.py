@@ -84,9 +84,9 @@ def joy_to_cmd_vel():
     global cmd_vel_pub  # Declare the cmd_vel_pub as global to be accessible in the callback
     #######################################################################################################
     ########################### Adding this part For Continuous Publishing the topic ######################
-    while not rospy.is_shutdown():
-        cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)  # Create a publisher for the /cmd_vel topic
-        rospy.sleep(1)
+
+    cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)  # Create a publisher for the /cmd_vel topic
+    rospy.sleep(1)
     ########################################################################################################
     ########################################################################################################
 

@@ -183,8 +183,8 @@ def callback(msg):
         
     
     
-    string_3 = '!VAR 3 ' + str(rpm_left) + '\r'
-    string_1 = '!VAR 1 ' + str(rpm_right) + '\r'
+    string_3 = '!VAR 3 ' + str(round(rpm_left)) + '\r'
+    string_1 = '!VAR 1 ' + str(round(rpm_right)) + '\r'
 
     # Function of Sending the orders in parallel not series
     motor_write_concurrent(string_3, string_1)

@@ -9,6 +9,7 @@ toggle_state = 0
 last_button_state = 0
 current_velocity = 0.0
 manual_control = True
+
 publish_time = 0.1  # Seconds
 twist = Twist()  # Twist message to hold the velocity commands
 cmd_vel_pub = None  # Global publisher for velocity commands
@@ -24,11 +25,11 @@ def joy_callback(data):
     if data.buttons[2] == 1 and last_button_state == 0:  # Button just pressed
         if toggle_state == 0:
             current_velocity = 0.9  # First press: set to 0.9 (6 km/hr)
-            rospy.loginfo("Moving with 6 Km/hr")
+            rospy.loginfo("Moving with 4 Km/hr")
             toggle_state = 1
         elif toggle_state == 1:
             current_velocity = 0.686  # Second press: set to 0.6 (4 km/hr)
-            rospy.loginfo("Moving with 4 Km/hr")
+            rospy.loginfo("Moving with 3 Km/hr")
             toggle_state = 2
         elif toggle_state == 2:
             current_velocity = 0.458  # Third press: set to 0.3 (2 km/hr)
@@ -48,19 +49,16 @@ def joy_callback(data):
         if axes_7 != 0:
             twist.linear.x = axes_7  # Forward/backward arrow
             rospy.loginfo("Forward/Backward arrow pressed")
-        elif axes_6 != 0:
-            twist.angular.z = axes_6  # Left/right arrow
-            rospy.loginfo("Left/Right arrow pressed")
-        elif axes_4 != 0:
+        else:
             twist.linear.x = axes_4  # Forward/backward joystick
             rospy.loginfo("Forward/Backward joystick pressed")
-        elif axes_3 != 0:
+        
+        if axes_6 != 0:
+            twist.angular.z = axes_6  # Left/right arrow
+            rospy.loginfo("Left/Right arrow pressed")
+        else:
             twist.angular.z = axes_3  # Left/right joystick
             rospy.loginfo("Left/Right joystick pressed")
-        else:
-            twist.linear.x = 0
-            twist.angular.z = 0  # Stop motion when no input is present
-
     else:
         # Apply velocity from button presses
         twist.linear.x = current_velocity
