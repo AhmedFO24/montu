@@ -28,10 +28,11 @@ import threading
 
 
 TUNNING = 18
-MAX_RPM_RIGHT = 965  # maximum wheel speed (rpm)
-MAX_RPM_LEFT = 1000
+MAX_RPM_RIGHT = 442  # maximum wheel speed (rpm)
+MAX_RPM_LEFT = 485
 driver_speed = [0]*2 # [0, 0]
 publish_time = 0.1 #sec
+file_name = input("Write the file name for exported data: ")
 
 # First thing is to connect to serial
 # Connect to serial driver (no change in it)
@@ -129,7 +130,7 @@ def write_data_to_file_and_publish():
         
         try:
             # Open the file in append mode
-            file_path = "/home/montu/record data/exported_data.txt"
+            file_path = f"/home/montu/record data/{file_name}.txt"
             
             # Ensure the directory exists, create it if it doesn't
             directory = os.path.dirname(file_path)
