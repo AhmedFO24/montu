@@ -14,5 +14,6 @@
         "millis",
         "rospkg",
         "setpoint"
-    ]
+    ],
+    "ros.distro": "noetic"
 }

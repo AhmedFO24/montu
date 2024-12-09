@@ -14,6 +14,11 @@ publish_time = 0.1  # Seconds
 twist = Twist()  # Twist message to hold the velocity commands
 cmd_vel_pub = None  # Global publisher for velocity commands
 
+def calc_current_velocity(value):
+    max_velocity = 4.3 # km/hr 4.3 for left and 4.2 for right
+    result = round(value*1/max_velocity)
+    return result
+
 
 def joy_callback(data):
     global toggle_state, last_button_state, current_velocity, manual_control, twist
@@ -24,18 +29,26 @@ def joy_callback(data):
     # Handle button press for toggle velocity
     if data.buttons[2] == 1 and last_button_state == 0:  # Button just pressed
         if toggle_state == 0:
-            current_velocity = 0.9  # First press: set to 0.9 (4 km/hr)
-            rospy.loginfo("Moving with 4 Km/hr")
+            current_velocity = calc_current_velocity(4.3) 
+            rospy.loginfo(f"Moving with {current_velocity} Km/hr")
             toggle_state = 1
         elif toggle_state == 1:
-            current_velocity = 0.686  # Second press: set to 0.6 (3 km/hr)
-            rospy.loginfo("Moving with 3 Km/hr")
+            current_velocity = calc_current_velocity(4) 
+            rospy.loginfo(f"Moving with {current_velocity} Km/hr")
             toggle_state = 2
         elif toggle_state == 2:
-            current_velocity = 0.458  # Third press: set to 0.3 (2 km/hr)
-            rospy.loginfo("Moving with 2 Km/hr")
+            current_velocity = calc_current_velocity(3) 
+            rospy.loginfo(f"Moving with {current_velocity} Km/hr")
             toggle_state = 3
         elif toggle_state == 3:
+            current_velocity = calc_current_velocity(2) 
+            rospy.loginfo(f"Moving with {current_velocity} Km/hr")
+            toggle_state = 4
+        elif toggle_state == 4:
+            current_velocity = calc_current_velocity(1) 
+            rospy.loginfo(f"Moving with {current_velocity} Km/hr")
+            toggle_state = 5
+        elif toggle_state == 5:
             current_velocity = 0.0  # Fourth press: stop
             rospy.loginfo("Stopped")
             toggle_state = 0

@@ -28,6 +28,8 @@ import threading
 
 max_velocity = 4.3 # km/hr 4.3 for left and 4.2 for right
 required_velocity = 4.2
+sprocket_radius = 195/2 # 195 is the diameter of the sprocket
+vehicle_weight = 112.5 # kg
 
 TUNNING = 18
 MAX_RPM_RIGHT = 970 # 985 4.2 km/hr maximum wheel speed (rpm)
@@ -120,10 +122,12 @@ def write_data_to_file_and_publish():
                 current_left_read = int(cleaned_rpm_values[3].strip())
                 power_right_read = int(cleaned_rpm_values[4].strip())
                 power_left_read = int(cleaned_rpm_values[5].strip())
-                Right_force = (48*30*current_right_read)/(0.1*3.14*rpm_right_read)
-                Left_force = (48*30*current_left_read)/(0.1*3.14*rpm_left_read)
-                packet= f"{(int(ms)/1000):.2f},{rpm_right_read},{rpm_left_read},{current_right_read},{current_left_read},{power_right_read},{power_left_read},{Right_force},{Left_force}\n"
-                rospy.loginfo(f"n_R: {rpm_right_read:.2f}RPM, n_L: {rpm_left_read:.2f}RPM, F_R: {Right_force:.2f}N, F_L: {Left_force:.2f}N")
+                velocity_right = (math.pi() * rpm_right_read / 30) * sprocket_radius # m/sec
+                velocity_left = (math.pi() * rpm_left_read / 30) * sprocket_radius # m/sec
+                Right_fd = ((48*30*current_right_read)/(0.1*3.14*rpm_right_read)) / vehicle_weight
+                Left_fd =((48*30*current_left_read)/(0.1*3.14*rpm_left_read)) / vehicle_weight
+                packet= f"{(int(ms)/1000):.2f},{rpm_right_read},{rpm_left_read},{current_right_read},{current_left_read},{power_right_read},{power_left_read},{Right_fd},{Left_fd},{velocity_right},{velocity_left}\n"
+                rospy.loginfo(f"n_R: {rpm_right_read:.2f}RPM, n_L: {rpm_left_read:.2f}RPM, F_R: {Right_fd:.2f}N, F_L: {Left_fd:.2f}N")
                 
             
             except (ValueError, ZeroDivisionError):
@@ -144,7 +148,7 @@ def write_data_to_file_and_publish():
                 # Check if the file is empty
                 if os.stat(file_path).st_size == 0:
                     # Write the header line if the file is empty
-                    file.write("time,rpm_right,rpm_left,current_right,current_left,power_right,power_left,force_right,force_left\n")
+                    file.write("time,rpm_right,rpm_left,current_right,current_left,power_right,power_left,fd_right,fd_left,velocity_right,velocity_left\n")
                 file.write(packet)
         except Exception as e:
             rospy.loginfo(f"an error occured: {e}")
