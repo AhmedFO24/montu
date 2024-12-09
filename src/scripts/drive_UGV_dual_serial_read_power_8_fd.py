@@ -26,18 +26,20 @@ import os
 from datetime import datetime
 import threading
 
-max_velocity = 4.3 # km/hr 4.3 for left and 4.2 for right
-required_velocity = 4.2
-sprocket_radius = 195/2 # 195 is the diameter of the sprocket
+sprocket_radius = 0.195/2   # 19.5 is the diameter of the sprocket
 vehicle_weight = 112.5 # kg
 
-TUNNING = 18
-MAX_RPM_RIGHT = 970 # 985 4.2 km/hr maximum wheel speed (rpm)
+
+max_velocity = 4.3 # km/hr 4.3 for left and 4.2 for right
+required_velocity = 4.3
+
+
+MAX_RPM_RIGHT = round(required_velocity*970/max_velocity) # 985 4.2 km/hr maximum wheel speed (rpm)
 MAX_RPM_LEFT = round(required_velocity*1000/max_velocity)
 
 driver_speed = [0]*2 # [0, 0]
 publish_time = 0.1 #sec
-file_name = input("Write the file name for exported data: ")
+file_name = input("Write the forward speed for exported data: ")
 
 # First thing is to connect to serial
 # Connect to serial driver (no change in it)
@@ -122,8 +124,8 @@ def write_data_to_file_and_publish():
                 current_left_read = int(cleaned_rpm_values[3].strip())
                 power_right_read = int(cleaned_rpm_values[4].strip())
                 power_left_read = int(cleaned_rpm_values[5].strip())
-                velocity_right = (math.pi() * rpm_right_read / 30) * sprocket_radius # m/sec
-                velocity_left = (math.pi() * rpm_left_read / 30) * sprocket_radius # m/sec
+                velocity_right = int((3.14 * rpm_right_read / 30) * sprocket_radius) # m/sec
+                velocity_left = int((3.14 * rpm_left_read / 30) * sprocket_radius) # m/sec
                 Right_fd = ((48*30*current_right_read)/(0.1*3.14*rpm_right_read)) / vehicle_weight
                 Left_fd =((48*30*current_left_read)/(0.1*3.14*rpm_left_read)) / vehicle_weight
                 packet= f"{(int(ms)/1000):.2f},{rpm_right_read},{rpm_left_read},{current_right_read},{current_left_read},{power_right_read},{power_left_read},{Right_fd},{Left_fd},{velocity_right},{velocity_left}\n"
@@ -137,7 +139,7 @@ def write_data_to_file_and_publish():
         
         try:
             # Open the file in append mode
-            file_path = f"/home/montu/record data/{file_name}.txt"
+            file_path = f"/home/montu/record data/straight_{file_name}.txt"
             
             # Ensure the directory exists, create it if it doesn't
             directory = os.path.dirname(file_path)

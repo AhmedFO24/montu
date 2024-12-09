@@ -16,7 +16,7 @@ cmd_vel_pub = None  # Global publisher for velocity commands
 
 def calc_current_velocity(value):
     max_velocity = 4.3 # km/hr 4.3 for left and 4.2 for right
-    result = round(value*1/max_velocity)
+    result = value*1/max_velocity
     return result
 
 
