@@ -27,10 +27,10 @@ from datetime import datetime
 import threading
 
 max_velocity = 4.3 # km/hr 4.3 for left and 4.2 for right
-required_velocity = 0
+required_velocity = 4.2
 
 TUNNING = 18
-MAX_RPM_RIGHT = 985  # maximum wheel speed (rpm)
+MAX_RPM_RIGHT = 970 # 985 4.2 km/hr maximum wheel speed (rpm)
 MAX_RPM_LEFT = round(required_velocity*1000/max_velocity)
 driver_speed = [0]*2 # [0, 0]
 publish_time = 0.1 #sec
