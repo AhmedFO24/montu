@@ -130,9 +130,7 @@ if ip a | grep -q "192.168.248"; then
   export ROS_MASTER_URI=http://192.168.248.101:11311
   echo "[INFO] ROS networking variables set for WiFi connection."
 else
-  echo "[INFO] ROS networking skipped (no 192.168.248.* network found)."
+  export ROS_MASTER_URI=http://localhost:11311
+  export ROS_IP=127.0.0.1
+  echo "[INFO] ROS running in standalone mode (localhost)."
 fi
-
-
-
-
